@@ -8,7 +8,8 @@ class Neural_Network:
     MNIST学習のためのニューラルネットワーク
     """
 
-    def __init__(self, sess=None, lr=0.01, epoch=10000, batch_size=100, interval=100):
+    def __init__(self, network="cnn", sess=None, lr=0.01, epoch=10000, batch_size=100, interval=100):
+        self.network = network
         self.lr = lr
         self.sess = tf.Session() if sess is None else sess
         self.epoch = epoch
@@ -30,8 +31,14 @@ class Neural_Network:
         activation = relu
         """
         
-        l1 = tf.layers.dense(inputs=self.x, units=100, activation=tf.nn.relu)
-        output = tf.layers.dense(inputs=l1, units=10, activation=None)
+        if self.network == "cnn":
+            x_reshape = tf.reshape(self.x, [-1, 28, 28, 1])
+            l1 = tf.layers.conv2d(x_reshape, filters=32, kernel_size=(3, 3), activation="relu")
+            l1_flat = tf.layers.flatten(l1)
+            output = tf.layers.dense(inputs=l1_flat, units=10, activation=None)
+        elif self.network == "dense":
+            l1 = tf.layers.dense(inputs=self.x, units=100, activation=tf.nn.relu)
+            output = tf.layers.dense(inputs=l1, units=10, activation=None)
 
         return output
     
